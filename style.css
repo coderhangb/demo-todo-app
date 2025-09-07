@@ -1,0 +1,226 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Patrick Hand SC", cursive;
+  font-size: 1.6rem;
+  font-weight: 400;
+  font-style: normal;
+  background: #1a261a;
+  color: #fff;
+}
+
+input,
+button,
+textarea,
+select {
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+button {
+  background: transparent;
+  border: none;
+}
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 50px;
+}
+
+.heading {
+  font-size: 6rem;
+  text-align: center;
+}
+
+.todo-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.input,
+.submit-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #fff;
+  background: transparent;
+  font-weight: 600;
+}
+
+.input {
+  flex: 1;
+}
+
+.submit-btn {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.todo-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.todo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 10px;
+}
+
+.todo-item__heading {
+  font-size: 2.5rem;
+}
+
+.todo-item-illustration {
+  width: calc(80% - 100px);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0.4;
+  z-index: 1;
+}
+
+.todo-tasks-wrap {
+  position: fixed;
+  z-index: 2;
+  width: 500px;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1d291d;
+  overflow: auto;
+}
+
+.todo-tasks {
+  overflow: auto;
+  padding: 10px 0px 30px 30px;
+  margin-right: 30px;
+  max-height: 400px;
+}
+
+.hide {
+  display: none;
+}
+
+.delete-todo-list {
+  font-size: 2rem;
+}
+
+.delete-todo-list:hover {
+  text-decoration: underline;
+}
+
+.task-item {
+  margin-top: 10px;
+  display: flex;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ea9652;
+}
+
+.task-item.completed {
+  opacity: 0.6;
+}
+
+.task-item.completed .task-title {
+  text-decoration: line-through;
+}
+
+.task-title {
+  flex: 1;
+}
+
+.task-action {
+  display: flex;
+  gap: 16px;
+}
+
+.task-btn {
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.task-btn.edit {
+  color: #50ad7e;
+}
+
+.task-btn.done {
+  color: #ea9652;
+}
+
+.task-btn.delete {
+  color: #a13538;
+}
+
+.task-btn:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.task-form {
+  margin-top: 0;
+  padding: 30px 30px 0px;
+}
+
+#total-plans {
+  margin-top: 10px;
+}
+
+.empty-task {
+  list-style: none;
+  grid-column: span 2;
+}
+
+.empty-img,
+.empty-task-img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+.empty-weldone,
+.empty-task-weldone {
+  font-size: 3rem;
+  text-align: center;
+}
+
+.empty-congratulation,
+.empty-task-congratulation {
+  margin-top: 5px;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.empty-task-img {
+  width: 200px;
+  height: 200px;
+}
+
+.empty-task-weldone {
+  font-size: 2.6rem;
+}
+
+.empty-task-congratulation {
+  font-size: 1.6rem;
+}
