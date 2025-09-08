@@ -28,8 +28,14 @@ todoList.addEventListener("click", function (e) {
   const tasksUl = document.getElementById(`todo-tasks-${index}`);
 
   if (e.target.closest(".delete-todo-list")) {
-    todoListData.splice(index, 1);
-    render();
+    if (
+      confirm(
+        `Are you sure you want to delete "${todoListData[index].title}" plan?`
+      )
+    ) {
+      todoListData.splice(index, 1);
+      render();
+    }
   }
   //   ===================
   else if (e.target.closest(".todo-item-illustration")) {
@@ -38,6 +44,11 @@ todoList.addEventListener("click", function (e) {
 
     modal.classList.toggle("hide");
     todoTasksWrap.classList.toggle("hide");
+
+    if (!todoTasksWrap.classList.contains("hide")) {
+      const input = todoItem.querySelector(`#task-input-${index}`);
+      if (input) input.focus();
+    }
 
     modal.onclick = function () {
       modal.classList.toggle("hide");
@@ -79,6 +90,11 @@ todoList.addEventListener("click", function (e) {
     ) {
       todoListData[index].todoTask.splice(taskIndex, 1);
       renderTask(tasksUl, todoListData[index].todoTask);
+
+      const todoTask = todoItem.querySelector(".todo-tasks");
+      if (todoTask.scrollHeight === todoTask.clientHeight) {
+        todoTask.style.marginRight = "30px";
+      }
     }
   }
 });
@@ -106,15 +122,29 @@ todoList.addEventListener("submit", function (e) {
   taskInput.value = "";
   const tasksUl = document.getElementById(`todo-tasks-${index}`);
   renderTask(tasksUl, todoListData[index].todoTask);
+
+  const todoTask = todoItem.querySelector(".todo-tasks");
+  if (todoTask.scrollHeight > todoTask.clientHeight) {
+    todoTask.style.marginRight = "15px";
+  }
 });
 
 function render() {
   const totalPlans = document.getElementById("total-plans");
+  if (!todoListData.length) {
+    todoList.innerHTML = `
+      <li class="empty-task">
+        <img src="./panda.png" alt="" class="empty-img">
+        <p class="empty-weldone">Well Done!</p>
+        <p class="empty-congratulation">You have nothing left to do. Time to recharge.</p>
+      </li>
+    `;
+    totalPlans.innerText = "";
+    return;
+  }
+
   const s = todoListData.length === 1 ? "" : "s";
-  totalPlans.innerText =
-    todoListData.length === 0
-      ? ""
-      : `You have total ${todoListData.length} plan${s}`;
+  totalPlans.innerText = `You have total ${todoListData.length} plan${s}`;
   const html = todoListData
     .map((todo, index) => {
       return `<li class="todo-item" data-todo-item-index="${index}">
@@ -151,16 +181,6 @@ function render() {
 
   todoList.innerHTML = html;
 
-  if (todoList.innerHTML === "") {
-    todoList.innerHTML = `
-      <li class="empty-task">
-        <img src="./panda.png" alt="" class="empty-img">
-        <p class="empty-weldone">Well Done!</p>
-        <p class="empty-congratulation">You have nothing left to do. Time to recharge.</p>
-      </li>
-    `;
-  }
-
   todoListData.forEach((list, index) => {
     const taskContainer = document.getElementById(`todo-tasks-${index}`);
     renderTask(taskContainer, list.todoTask);
@@ -169,6 +189,17 @@ function render() {
 render();
 
 function renderTask(domElement, task) {
+  if (!task.length) {
+    domElement.innerHTML = `
+      <li class="empty-task">
+        <img src="./shiba.png" alt="" class="empty-task-img">
+        <p class="empty-task-weldone">Good job!</p>
+        <p class="empty-task-congratulation">You've been working very hard. Take a break.</p>
+      </li>
+    `;
+    return;
+  }
+
   const html = task
     .map((task, index) => {
       return `<li class="task-item ${
@@ -187,14 +218,4 @@ function renderTask(domElement, task) {
     .join("");
 
   domElement.innerHTML = html;
-
-  if (domElement.innerHTML === "") {
-    domElement.innerHTML = `
-      <li class="empty-task">
-        <img src="./shiba.png" alt="" class="empty-task-img">
-        <p class="empty-task-weldone">Good job!</p>
-        <p class="empty-task-congratulation">You've been working very hard. Take a break.</p>
-      </li>
-    `;
-  }
 }
