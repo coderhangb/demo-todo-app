@@ -1,8 +1,12 @@
-let todoListData = [];
+let todoListData = JSON.parse(localStorage.getItem("todoListData")) ?? [];
 
 const todoForm = document.getElementById("todo-form");
 const todoInput = document.getElementById("todo-input");
 const todoList = document.getElementById("todo-list");
+
+function saveData() {
+  localStorage.setItem("todoListData", JSON.stringify(todoListData));
+}
 
 todoForm.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -26,6 +30,7 @@ todoForm.addEventListener("submit", function (e) {
   todoListData.push(newValue);
   todoInput.value = "";
   render();
+  saveData();
 });
 
 todoList.addEventListener("click", function (e) {
@@ -42,6 +47,7 @@ todoList.addEventListener("click", function (e) {
     ) {
       todoListData.splice(index, 1);
       render();
+      saveData();
     }
   }
   //   ===================
@@ -57,10 +63,13 @@ todoList.addEventListener("click", function (e) {
       if (input) input.focus();
     }
 
-    modal.onclick = function () {
-      modal.classList.toggle("hide");
-      todoTasksWrap.classList.toggle("hide");
-    };
+    if (modal.getAttribute("data-is-handled") === "0") {
+      modal.addEventListener("click", function () {
+        modal.classList.toggle("hide");
+        todoTasksWrap.classList.toggle("hide");
+      });
+      modal.setAttribute("data-is-handled", "1");
+    }
   }
   //   ===================
   else if (e.target.closest(".edit")) {
@@ -83,6 +92,7 @@ todoList.addEventListener("click", function (e) {
     if (newTitle !== null && newTitle.trim() !== "") {
       todoListData[index].todoTask[taskIndex].title = newTitle.trim();
       renderTask(tasksUl, todoListData[index].todoTask);
+      saveData();
     }
   }
   //   ===================
@@ -93,6 +103,7 @@ todoList.addEventListener("click", function (e) {
     todoListData[index].todoTask[taskIndex].completed =
       !todoListData[index].todoTask[taskIndex].completed;
     renderTask(tasksUl, todoListData[index].todoTask);
+    saveData();
   }
   //   ===================
   else if (e.target.closest(".delete")) {
@@ -106,6 +117,7 @@ todoList.addEventListener("click", function (e) {
     ) {
       todoListData[index].todoTask.splice(taskIndex, 1);
       renderTask(tasksUl, todoListData[index].todoTask);
+      saveData();
 
       const todoTask = todoItem.querySelector(".todo-tasks");
       if (todoTask.scrollHeight === todoTask.clientHeight) {
@@ -145,6 +157,7 @@ todoList.addEventListener("submit", function (e) {
   taskInput.value = "";
   const tasksUl = document.getElementById(`todo-tasks-${index}`);
   renderTask(tasksUl, todoListData[index].todoTask);
+  saveData();
 
   const todoTask = todoItem.querySelector(".todo-tasks");
   if (todoTask.scrollHeight > todoTask.clientHeight) {
@@ -174,7 +187,7 @@ function render() {
           <h2 class="todo-item__heading">${todo.title}</h2>
           <img src="./note.png" alt="" class="todo-item-illustration" />
 
-          <div class="modal hide"></div>
+          <div class="modal hide" data-is-handled="0"></div>
 
           <div class="todo-tasks-wrap hide">
             <form id="task-form-${index}" action="" class="todo-form task-form">
