@@ -12,6 +12,13 @@ todoForm.addEventListener("submit", function (e) {
     todoInput.value = "";
     return;
   }
+  for (let list of todoListData) {
+    if (list.title.toLowerCase() === value.toLowerCase()) {
+      alert(`A plan with this title already exists!`);
+      todoInput.value = "";
+      return;
+    }
+  }
   const newValue = {
     title: value,
     todoTask: [],
@@ -60,10 +67,19 @@ todoList.addEventListener("click", function (e) {
     const taskItem = e.target.closest(".task-item");
     if (!taskItem) return;
     const taskIndex = +taskItem.getAttribute("task-index");
+    const currentTitle = todoListData[index].todoTask[taskIndex].title;
     const newTitle = prompt(
       "Enter new task title:",
       todoListData[index].todoTask[taskIndex].title
     );
+    if (newTitle !== currentTitle) {
+      for (let task of todoListData[index].todoTask) {
+        if (task.title.toLowerCase() === newTitle.toLowerCase()) {
+          alert(`A task with this title already exists!`);
+          return;
+        }
+      }
+    }
     if (newTitle !== null && newTitle.trim() !== "") {
       todoListData[index].todoTask[taskIndex].title = newTitle.trim();
       renderTask(tasksUl, todoListData[index].todoTask);
@@ -113,6 +129,13 @@ todoList.addEventListener("submit", function (e) {
     alert("There's nothing to add");
     taskInput.value = "";
     return;
+  }
+  for (let task of todoListData[index].todoTask) {
+    if (task.title.toLowerCase() === value.toLowerCase()) {
+      alert(`A task with this title already exists!`);
+      taskInput.value = "";
+      return;
+    }
   }
   const newValue = {
     title: value,

@@ -113,6 +113,7 @@ main {
   margin: 0px 30px;
   overflow: auto;
   max-height: 290px;
+  background: inherit;
 }
 
 .hide {
