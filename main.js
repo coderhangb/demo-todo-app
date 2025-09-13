@@ -4,9 +4,22 @@ const todoForm = document.getElementById("todo-form");
 const todoInput = document.getElementById("todo-input");
 const todoList = document.getElementById("todo-list");
 
+function escapeHTML(html) {
+  const div = document.createElement("div");
+  div.innerText = html;
+  return div.innerHTML;
+}
+
 function saveData() {
   localStorage.setItem("todoListData", JSON.stringify(todoListData));
 }
+
+window.addEventListener("storage", function (e) {
+  if (e.key === "todoListData") {
+    todoListData = JSON.parse(localStorage.getItem("todoListData")) ?? [];
+    render();
+  }
+});
 
 todoForm.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -184,7 +197,7 @@ function render() {
   const html = todoListData
     .map((todo, index) => {
       return `<li class="todo-item" data-todo-item-index="${index}">
-          <h2 class="todo-item__heading">${todo.title}</h2>
+          <h2 class="todo-item__heading">${escapeHTML(todo.title)}</h2>
           <img src="./note.png" alt="" class="todo-item-illustration" />
 
           <div class="modal hide" data-is-handled="0"></div>
@@ -241,7 +254,7 @@ function renderTask(domElement, task) {
       return `<li class="task-item ${
         task.completed ? "completed" : ""
       }" task-index="${index}">
-          <span class="task-title">${task.title}</span>
+          <span class="task-title">${escapeHTML(task.title)}</span>
           <div class="task-action">
               <button class="task-btn edit">Edit</button>
               <button class="task-btn done">${
