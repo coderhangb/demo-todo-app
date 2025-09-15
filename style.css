@@ -100,7 +100,7 @@ main {
   position: fixed;
   z-index: 2;
   width: 500px;
-  height: 380px;
+  height: 430px;
   border: 1px solid #fff;
   border-radius: 20px;
   top: 50%;
@@ -231,4 +231,17 @@ main {
 
 .empty-task-congratulation {
   font-size: 1.6rem;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 60%;
+  padding: 0px 30px 10px;
+  height: 40px;
+}
+
+.search-input {
+  height: 100%;
+  font-size: 1.4rem;
 }

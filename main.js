@@ -21,6 +21,17 @@ window.addEventListener("storage", function (e) {
   }
 });
 
+// Debounce
+function debounce(func, delay) {
+  let timeOutId;
+  return function (...args) {
+    clearTimeout(timeOutId);
+    timeOutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
 todoForm.addEventListener("submit", function (e) {
   e.preventDefault();
   const value = todoInput.value.trim();
@@ -72,8 +83,12 @@ todoList.addEventListener("click", function (e) {
     todoTasksWrap.classList.toggle("hide");
 
     if (!todoTasksWrap.classList.contains("hide")) {
+      const searchInput = document.getElementById(`search-input-${index}`);
       const input = todoItem.querySelector(`#task-input-${index}`);
       if (input) input.focus();
+      searchInput.value = "";
+      input.value = "";
+      tasksUl.classList.remove("searched-task");
     }
 
     if (modal.getAttribute("data-is-handled") === "0") {
@@ -83,6 +98,7 @@ todoList.addEventListener("click", function (e) {
       });
       modal.setAttribute("data-is-handled", "1");
     }
+    renderTask(tasksUl, todoListData[index].todoTask);
   }
   //   ===================
   else if (e.target.closest(".edit")) {
@@ -96,7 +112,11 @@ todoList.addEventListener("click", function (e) {
     );
     if (newTitle !== currentTitle) {
       for (let task of todoListData[index].todoTask) {
-        if (task.title.toLowerCase() === newTitle.toLowerCase()) {
+        if (
+          task.title &&
+          newTitle &&
+          task.title.toLowerCase() === newTitle.toLowerCase()
+        ) {
           alert(`A task with this title already exists!`);
           return;
         }
@@ -104,7 +124,10 @@ todoList.addEventListener("click", function (e) {
     }
     if (newTitle !== null && newTitle.trim() !== "") {
       todoListData[index].todoTask[taskIndex].title = newTitle.trim();
-      renderTask(tasksUl, todoListData[index].todoTask);
+      renderTask(
+        tasksUl,
+        getFilteredTodoListData(index) ?? todoListData[index].todoTask
+      );
       saveData();
     }
   }
@@ -115,7 +138,10 @@ todoList.addEventListener("click", function (e) {
     const taskIndex = +taskItem.getAttribute("task-index");
     todoListData[index].todoTask[taskIndex].completed =
       !todoListData[index].todoTask[taskIndex].completed;
-    renderTask(tasksUl, todoListData[index].todoTask);
+    renderTask(
+      tasksUl,
+      getFilteredTodoListData(index) ?? todoListData[index].todoTask
+    );
     saveData();
   }
   //   ===================
@@ -129,7 +155,10 @@ todoList.addEventListener("click", function (e) {
       )
     ) {
       todoListData[index].todoTask.splice(taskIndex, 1);
-      renderTask(tasksUl, todoListData[index].todoTask);
+      renderTask(
+        tasksUl,
+        getFilteredTodoListData(index) ?? todoListData[index].todoTask
+      );
       saveData();
 
       const todoTask = todoItem.querySelector(".todo-tasks");
@@ -178,6 +207,39 @@ todoList.addEventListener("submit", function (e) {
   }
 });
 
+const debouncedSearchFunc = debounce(function (e) {
+  const todoItem = e.target.closest(".todo-item");
+  if (!todoItem) return;
+  const index = +todoItem.getAttribute("data-todo-item-index");
+  const searchInput = document.getElementById(`search-input-${index}`);
+  if (!searchInput || e.target !== searchInput) return;
+  let value = searchInput.value.trim().toLowerCase();
+  const filteredTodoListData = todoListData[index].todoTask
+    .map((item, originalIndex) => ({ ...item, originalIndex }))
+    .filter((item) => {
+      return item.title.toLowerCase().includes(value);
+    });
+  const tasksUL = document.getElementById(`todo-tasks-${index}`);
+  if (value) {
+    tasksUL.classList.add("searched-task");
+  } else {
+    tasksUL.classList.remove("searched-task");
+  }
+  renderTask(tasksUL, filteredTodoListData);
+}, 500);
+
+todoList.addEventListener("input", debouncedSearchFunc);
+
+function getFilteredTodoListData(index) {
+  const searchInput = document.getElementById(`search-input-${index}`);
+  let value = searchInput.value.trim().toLowerCase();
+  return todoListData[index].todoTask
+    .map((item, originalIndex) => ({ ...item, originalIndex }))
+    .filter((item) => {
+      return item.title.toLowerCase().includes(value);
+    });
+}
+
 function render() {
   const totalPlans = document.getElementById("total-plans");
   if (!todoListData.length) {
@@ -220,6 +282,16 @@ function render() {
                 Add
               </button>
             </form>
+            <label class="search-bar" id="search-bar-${index}">
+              <input
+                type="text"
+                name=""
+                id="search-input-${index}"
+                class="search-input input"
+                autocomplete="off"
+                placeholder="Search your task"
+              />
+            </label>
             <ul id="todo-tasks-${index}" class="todo-tasks">
             </ul>
           </div>
@@ -239,6 +311,16 @@ render();
 
 function renderTask(domElement, task) {
   if (!task.length) {
+    if (domElement.classList.contains("searched-task")) {
+      domElement.innerHTML = `
+      <li class="empty-task">
+        <img src="./cat.png" alt="" class="empty-task-img">
+        <p class="empty-task-weldone">Oops!</p>
+        <p class="empty-task-congratulation">Hmm... nothing found. Maybe try a different word?</p>
+      </li>
+    `;
+      return;
+    }
     domElement.innerHTML = `
       <li class="empty-task">
         <img src="./shiba.png" alt="" class="empty-task-img">
@@ -253,7 +335,7 @@ function renderTask(domElement, task) {
     .map((task, index) => {
       return `<li class="task-item ${
         task.completed ? "completed" : ""
-      }" task-index="${index}">
+      }" task-index="${task.originalIndex ?? index}">
           <span class="task-title">${escapeHTML(task.title)}</span>
           <div class="task-action">
               <button class="task-btn edit">Edit</button>
