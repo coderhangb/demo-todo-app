@@ -32,6 +32,19 @@ function debounce(func, delay) {
   };
 }
 
+function getScrollbarWidth() {
+  const div = document.createElement("div");
+  Object.assign(div.style, {
+    overflow: "scroll",
+    position: "absolute",
+    top: "-999",
+  });
+  document.body.appendChild(div);
+  const scrollbarWidth = div.offsetWidth - div.clientWidth;
+  div.remove();
+  return scrollbarWidth;
+}
+
 todoForm.addEventListener("submit", function (e) {
   e.preventDefault();
   const value = todoInput.value.trim();
@@ -89,12 +102,26 @@ todoList.addEventListener("click", function (e) {
       searchInput.value = "";
       input.value = "";
       tasksUl.classList.remove("searched-task");
+      document.body.style.overflowY = "hidden";
+      if (
+        document.documentElement.scrollHeight >
+        document.documentElement.clientHeight
+      ) {
+        document.body.style.marginRight = getScrollbarWidth() + "px";
+      }
     }
 
     if (modal.getAttribute("data-is-handled") === "0") {
       modal.addEventListener("click", function () {
         modal.classList.toggle("hide");
         todoTasksWrap.classList.toggle("hide");
+        document.body.style.overflowY = "";
+        if (
+          document.documentElement.scrollHeight >
+          document.documentElement.clientHeight
+        ) {
+          document.body.style.marginRight = "";
+        }
       });
       modal.setAttribute("data-is-handled", "1");
     }
@@ -163,7 +190,7 @@ todoList.addEventListener("click", function (e) {
 
       const todoTask = todoItem.querySelector(".todo-tasks");
       if (todoTask.scrollHeight === todoTask.clientHeight) {
-        todoTask.style.marginRight = "30px";
+        todoTask.style.marginRight = "";
       }
     }
   }
@@ -203,7 +230,7 @@ todoList.addEventListener("submit", function (e) {
 
   const todoTask = todoItem.querySelector(".todo-tasks");
   if (todoTask.scrollHeight > todoTask.clientHeight) {
-    todoTask.style.marginRight = "15px";
+    todoTask.style.marginRight = 30 - getScrollbarWidth() + "px";
   }
 });
 
@@ -306,6 +333,18 @@ function render() {
     const taskContainer = document.getElementById(`todo-tasks-${index}`);
     renderTask(taskContainer, list.todoTask);
   });
+
+  if (
+    document.documentElement.scrollHeight >
+    document.documentElement.clientHeight
+  ) {
+    document.body.style.paddingRight = "";
+  } else if (
+    document.documentElement.scrollHeight ===
+    document.documentElement.clientHeight
+  ) {
+    document.body.style.paddingRight = getScrollbarWidth() + "px";
+  }
 }
 render();
 
